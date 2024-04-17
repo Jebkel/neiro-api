@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"online-shop/config"
+	"neiro-api/config"
 	"strings"
 	"time"
 )
@@ -13,8 +13,8 @@ import (
 func UseJSONLogFormat() {
 	cfg := config.GetConfig()
 	log.SetFormatter(&JSONFormatter{
-		Program: cfg.ProjectName,
-		Env:     cfg.Env,
+		Program: cfg.App.ProjectName,
+		Env:     cfg.App.Env,
 	})
 }
 

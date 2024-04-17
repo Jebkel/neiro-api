@@ -3,7 +3,7 @@ package middlewares
 import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
-	"online-shop/internal/utils"
+	"neiro-api/internal/utils"
 	"time"
 )
 

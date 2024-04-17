@@ -10,7 +10,9 @@ type UserSessions struct {
 
 	RefreshToken string `json:"refresh_token" gorm:"uniqueIndex"`
 	IpAddress    string `json:"ip_address"`
-	User         User   `json:"user"`
+
+	UserID uint `json:"user_id"`
+	User   User `json:"user" gorm:"foreignKey:user_id"`
 
 	CreatedAt time.Time      `json:"created_at"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`

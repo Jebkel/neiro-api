@@ -1,7 +1,7 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 	"os"
 	"time"
 )
@@ -24,11 +24,15 @@ type JwtConfig struct {
 	JwtRefreshDuration time.Duration `yaml:"jwt_refresh_duration"`
 }
 
-type Config struct {
-	AppPort     string `yaml:"app_port"`
-	AppHost     string `yaml:"app_host"`
+type AppConfig struct {
+	Port        string `yaml:"port"`
+	Host        string `yaml:"host"`
 	Env         string `yaml:"environment"`
 	ProjectName string `yaml:"project_name"`
+}
+
+type Config struct {
+	App AppConfig `yaml:"app_config"`
 
 	JwtConfig JwtConfig `yaml:"jwt_config"`
 	DBConfig  DBConfig  `yaml:"db_config"`

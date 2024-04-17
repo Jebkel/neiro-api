@@ -3,8 +3,8 @@ package middlewares
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"neiro-api/internal/services"
 	"net/http"
-	"online-shop/internal/services"
 	"regexp"
 )
 

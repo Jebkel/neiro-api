@@ -1,11 +1,12 @@
-app_port: "8080"
-app_host: "localhost"
-environment: "development"
-project_name: "Neiro-API"
+app:
+  port: "8080"
+  host: "localhost"
+  environment: "development"
+  project_name: "Neiro-API"
 
 jwt_config:
   jwt_secret: "64lenghtStringForJwtKey"
-  jwt_duration: "60m"
+  jwt_duration: 60m
   jwt_refresh_duration: "43200m" // 30 days
 
 
