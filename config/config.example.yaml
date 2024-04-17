@@ -1,0 +1,21 @@
+app_port: "8080"
+app_host: "localhost"
+environment: "development"
+project_name: "Neiro-API"
+
+jwt_config:
+  jwt_secret: "64lenghtStringForJwtKey"
+  jwt_duration: "60m"
+  jwt_refresh_duration: "43200m" // 30 days
+
+
+db_config:
+  connection: "mysql"
+  host: "localhost"
+  port: "3306"
+  database: "dbname"
+  username: "username"
+  password: "password"
+  collation: "utf8mb4_general_ci"
+  min_connections: 10
+  max_connections: 500
