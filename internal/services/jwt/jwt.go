@@ -14,19 +14,19 @@ import (
 	"time"
 )
 
-type JwtService struct {
+type Service struct {
 	db          *gorm.DB
 	secretKey   []byte
 	tokenExpire time.Duration
 }
 
-type JwtCustomClaims struct {
+type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func NewJwtService() *JwtService {
+func NewJwtService() *Service {
 	cfg := config.GetConfig().JwtConfig
-	return &JwtService{
+	return &Service{
 		db:          database.GetDB(),
 		secretKey:   []byte(cfg.JWTSecret),
 		tokenExpire: cfg.JwtDuration,
@@ -34,8 +34,8 @@ func NewJwtService() *JwtService {
 }
 
 // ParseJwtToken : Проверяет рабочий ли токен и возвращает данные из токена в случае успеха
-func (j *JwtService) ParseJwtToken(tokenString string) (*JwtCustomClaims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &JwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+func (j *Service) ParseJwtToken(tokenString string) (*CustomClaims, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Проверка на метод, используемый для подписи токена
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signed method: %v", token.Header["alg"])
@@ -46,7 +46,7 @@ func (j *JwtService) ParseJwtToken(tokenString string) (*JwtCustomClaims, error)
 	if err != nil || !token.Valid {
 		return nil, errors.New("invalid token")
 	}
-	claims, ok := token.Claims.(*JwtCustomClaims)
+	claims, ok := token.Claims.(*CustomClaims)
 	if !ok || claims == nil {
 		log.Error("failed to parse JWT claims")
 		return nil, errors.New("invalid token")
@@ -55,7 +55,7 @@ func (j *JwtService) ParseJwtToken(tokenString string) (*JwtCustomClaims, error)
 }
 
 // CheckTokenInDB : проверяет, существует ли сессия в базе данных
-func (j *JwtService) CheckTokenInDB(jwtID string) (bool, error) {
+func (j *Service) CheckTokenInDB(jwtID string) (bool, error) {
 	var UserSession models.UserSessions
 	result := j.db.Where("id = ?", jwtID).First(&UserSession)
 	if result.Error != nil || result.RowsAffected == 0 {
@@ -65,11 +65,11 @@ func (j *JwtService) CheckTokenInDB(jwtID string) (bool, error) {
 }
 
 // DeprecateSession : удаляет сессию из базы данных
-func (j *JwtService) DeprecateSession(jwtID string) {
+func (j *Service) DeprecateSession(jwtID string) {
 	j.db.Delete(&models.UserSessions{}, jwtID)
 }
 
-func (j *JwtService) CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error) {
+func (j *Service) CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error) {
 	refreshToken = uuid.New().String()
 	userSession := models.UserSessions{
 		IpAddress:    ipAddress,
@@ -78,7 +78,7 @@ func (j *JwtService) CreateJwtToken(userID uint, ipAddress string) (signedToken 
 	}
 	j.db.Create(&userSession)
 
-	claims := JwtCustomClaims{
+	claims := CustomClaims{
 		jwt.RegisteredClaims{
 			ID:        strconv.Itoa(int(userSession.ID)),
 			Subject:   strconv.Itoa(int(userID)),

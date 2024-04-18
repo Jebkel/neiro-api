@@ -3,6 +3,8 @@ package middlewares
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"neiro-api/internal/database"
+	"neiro-api/internal/models"
 	"neiro-api/internal/services/jwt"
 	"net/http"
 	"regexp"
@@ -31,8 +33,18 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			})
 			return
 		}
-		c.Set("jwtClaims", claims)
 
+		var user models.User
+		db := database.GetDB()
+		if err := db.Find(&user, claims.Subject).Error; err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"message": "session expired",
+			})
+			return
+		}
+		c.Set("user", user)
+		c.Set("language", user.Language)
+		c.Set("jwtClaims", claims)
 		c.Next()
 	}
 }

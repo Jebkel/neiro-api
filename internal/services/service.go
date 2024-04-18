@@ -18,7 +18,7 @@ type Translator interface {
 }
 
 type JwtManager interface {
-	ParseJwtToken(tokenString string) (*jwt.JwtCustomClaims, error)
+	ParseJwtToken(tokenString string) (*jwt.CustomClaims, error)
 	CheckTokenInDB(jwtID string) (bool, error)
 	DeprecateSession(jwtID string)
 	CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error)

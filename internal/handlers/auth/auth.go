@@ -2,12 +2,14 @@ package auth
 
 import (
 	"github.com/gin-gonic/gin"
+	"neiro-api/config"
 	"neiro-api/internal/database"
 	"neiro-api/internal/handlers"
 	"neiro-api/internal/helpers"
 	"neiro-api/internal/models"
 	"neiro-api/internal/utils"
 	"net/http"
+	"time"
 )
 
 type HandlerAuth struct {
@@ -18,6 +20,7 @@ func (h HandlerAuth) Init(g *gin.RouterGroup) {
 	// Initialize handlers
 	g.POST("/register", h.Register)
 	g.POST("/login", h.Login)
+	g.POST("/refresh", h.RefreshJwt)
 }
 
 func (h HandlerAuth) Register(c *gin.Context) {
@@ -114,4 +117,39 @@ func (h HandlerAuth) Login(c *gin.Context) {
 		"refresh_token": refreshToken,
 		"user":          &user,
 	}, "Login successfully")
+}
+
+func (h HandlerAuth) RefreshJwt(c *gin.Context) {
+	db := database.GetDB()
+
+	type RequestBody struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+	var body RequestBody
+
+	if err := c.ShouldBindJSON(&body); err != nil {
+		h.Services.HandleError(c, err)
+		return
+	}
+
+	var userSession models.UserSessions
+	if err := db.Where("refresh_token = ?", body.RefreshToken).First(&userSession).Error; err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	cfg := config.GetConfig().JwtConfig
+	if time.Since(userSession.CreatedAt) >= cfg.JwtRefreshDuration {
+		c.AbortWithStatus(http.StatusUnauthorized)
+	}
+	db.Delete(&userSession)
+
+	accessToken, refreshToken, err := h.Services.JwtManager.CreateJwtToken(userSession.UserID, c.ClientIP())
+	if err != nil {
+		utils.NewErrorResponse(c, http.StatusInternalServerError, "Internal server error", &gin.H{})
+		return
+	}
+	utils.NewSuccessResponse(c, http.StatusOK, &gin.H{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	}, "Tokens refresh successfully")
 }
