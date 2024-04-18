@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"neiro-api/internal/handlers"
 	"neiro-api/internal/handlers/auth"
+	"neiro-api/internal/handlers/user"
 	"neiro-api/internal/middlewares"
 	"neiro-api/internal/redis"
 	"neiro-api/pkg/ratelimit"
@@ -24,12 +25,12 @@ func Init() *gin.Engine {
 	r.Use(middlewares.JsonLogMiddleware(), gin.Recovery())
 	r.Use(middlewares.RequestID(middlewares.RequestIDOptions{AllowSetting: false}))
 	r.Use(middlewares.CORS(middlewares.CORSOptions{}))
+	r.Use(mw)
 
 	handler := handlers.NewHandler()
 
-	authGroup := r.Group("/auth")
-	authGroup.Use(mw)
-	auth.HandlerAuth{Handler: handler}.Init(authGroup)
+	auth.HandlerAuth{Handler: handler}.Init(r.Group("/auth"))
+	user.HandlerUser{Handler: handler}.Init(r.Group("/user"))
 
 	return r
 }

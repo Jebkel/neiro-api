@@ -5,7 +5,9 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"neiro-api/internal/models"
+	"neiro-api/internal/helpers"
+	"neiro-api/internal/services/i18n"
+	"neiro-api/internal/services/jwt"
 	"neiro-api/internal/utils"
 	"net/http"
 )
@@ -16,10 +18,10 @@ type Translator interface {
 }
 
 type JwtManager interface {
-	ParseJwtToken(tokenString string) (*JwtCustomClaims, error)
+	ParseJwtToken(tokenString string) (*jwt.JwtCustomClaims, error)
 	CheckTokenInDB(jwtID string) (bool, error)
 	DeprecateSession(jwtID string)
-	CreateJwtToken(user *models.User, ipAddress string) (signedToken string, refreshToken string, err error)
+	CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error)
 }
 
 type Service struct {
@@ -29,13 +31,13 @@ type Service struct {
 
 func NewService() *Service {
 	return &Service{
-		Translator: NewI18NService(),
-		JwtManager: NewJwtService(),
+		Translator: i18n.NewI18NService(),
+		JwtManager: jwt.NewJwtService(),
 	}
 }
 
 func (s *Service) HandleError(c *gin.Context, err error) {
-	language := utils.GetLanguage(c)
+	language := helpers.GetLanguage(c)
 	err = unwrapRecursive(err)
 	switch errs := err.(type) {
 	case validator.ValidationErrors:

@@ -1,8 +1,8 @@
-package utils
+package helpers
 
 import (
 	"github.com/gin-gonic/gin"
-	"neiro-api/internal/services"
+	"neiro-api/internal/services/jwt"
 	"net/mail"
 )
 
@@ -23,12 +23,12 @@ func GetLanguage(c *gin.Context) string {
 	return langString
 }
 
-func GetJwtClaims(c *gin.Context) *services.JwtCustomClaims {
+func GetJwtClaims(c *gin.Context) *jwt.JwtCustomClaims {
 	claims, ok := c.Get("jwtClaims")
 	if !ok {
 		return nil
 	}
-	claimsObject, ok := claims.(*services.JwtCustomClaims)
+	claimsObject, ok := claims.(*jwt.JwtCustomClaims)
 	if !ok {
 		return nil
 	}

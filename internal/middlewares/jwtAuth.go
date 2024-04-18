@@ -3,7 +3,7 @@ package middlewares
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"neiro-api/internal/services"
+	"neiro-api/internal/services/jwt"
 	"net/http"
 	"regexp"
 )
@@ -17,7 +17,7 @@ func JwtAuthMiddleware() gin.HandlerFunc {
 			})
 			return
 		}
-		jwtService := services.NewJwtService()
+		jwtService := jwt.NewJwtService()
 		claims, err := jwtService.ParseJwtToken(tokenString)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{

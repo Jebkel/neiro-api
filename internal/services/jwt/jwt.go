@@ -1,4 +1,4 @@
-package services
+package jwt
 
 import (
 	"errors"
@@ -69,11 +69,11 @@ func (j *JwtService) DeprecateSession(jwtID string) {
 	j.db.Delete(&models.UserSessions{}, jwtID)
 }
 
-func (j *JwtService) CreateJwtToken(user *models.User, ipAddress string) (signedToken string, refreshToken string, err error) {
+func (j *JwtService) CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error) {
 	refreshToken = uuid.New().String()
 	userSession := models.UserSessions{
 		IpAddress:    ipAddress,
-		User:         *user,
+		UserID:       userID,
 		RefreshToken: refreshToken,
 	}
 	j.db.Create(&userSession)
@@ -81,7 +81,7 @@ func (j *JwtService) CreateJwtToken(user *models.User, ipAddress string) (signed
 	claims := JwtCustomClaims{
 		jwt.RegisteredClaims{
 			ID:        strconv.Itoa(int(userSession.ID)),
-			Subject:   strconv.Itoa(int(user.ID)),
+			Subject:   strconv.Itoa(int(userID)),
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(j.tokenExpire)),
 		},
 	}

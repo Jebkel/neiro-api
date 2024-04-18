@@ -14,13 +14,12 @@ import (
 )
 
 func main() {
-
-	utils.UseJSONLogFormat()
-
 	err := config.Init("config/config.yaml")
 	if err != nil {
 		log.Fatalf("failed to load configuration: %v", err)
 	}
+
+	utils.UseJSONLogFormat()
 
 	sqlDB := database.Init()
 	models.Migrate()
