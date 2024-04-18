@@ -8,17 +8,19 @@ import (
 	"neiro-api/config"
 	"neiro-api/internal/database"
 	"neiro-api/internal/models"
+	"neiro-api/internal/redis"
 	"neiro-api/internal/routes"
 	"neiro-api/internal/utils"
 )
 
 func main() {
+
+	utils.UseJSONLogFormat()
+
 	err := config.Init("config/config.yaml")
 	if err != nil {
 		log.Fatalf("failed to load configuration: %v", err)
 	}
-
-	utils.UseJSONLogFormat()
 
 	sqlDB := database.Init()
 	models.Migrate()
@@ -30,10 +32,15 @@ func main() {
 		}
 	}(sqlDB)
 
+	redis.Init()
+
 	gin.SetMode(gin.DebugMode)
 
 	r := routes.Init()
-
+	err = r.SetTrustedProxies(nil)
+	if err != nil {
+		log.Error(err)
+	}
 	cfg := config.GetConfig()
 	log.Fatal(r.Run(fmt.Sprintf("%s:%s", cfg.App.Host, cfg.App.Port)))
 }

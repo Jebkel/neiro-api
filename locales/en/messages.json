@@ -22,5 +22,13 @@
   {
     "Key": "password_already_using",
     "Default": "You are already using this password"
+  },
+  {
+    "Key": "email_already_using",
+    "Default": "This email is already in use"
+  },
+  {
+    "Key": "invalid_login",
+    "Default": "This login or email was not found"
   }
 ]

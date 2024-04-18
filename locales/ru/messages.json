@@ -22,5 +22,9 @@
   {
     "Key": "password_already_using",
     "Default": "Вы уже используете этот пароль"
+  },
+  {
+    "Key": "email_already_using",
+    "Default": "Данный имейл уже используется"
   }
 ]

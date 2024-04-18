@@ -22,5 +22,9 @@
   {
     "Key": "field_datetime",
     "Default": "The date format is incorrect or the specified date is already in the past"
+  },
+  {
+    "Key": "field_email",
+    "Default": "This field must be email"
   }
 ]

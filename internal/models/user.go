@@ -9,17 +9,17 @@ import (
 type User struct {
 	ID uint `json:"id" gorm:"primaryKey"`
 
-	Email       string `json:"email" gorm:"uniqueIndex"`
-	Username    string `json:"username" gorm:"uniqueIndex"`
-	DisplayName string `json:"display_name"`
+	Email           string     `json:"email" gorm:"uniqueIndex"`
+	Username        string     `json:"username" gorm:"uniqueIndex"`
+	EmailVerifiedAt *time.Time `json:"email_verified_at" gorm:"type:TIMESTAMP;null;default:null"`
 
 	Language string `json:"language" gorm:"default:'en'"`
 
 	Password string `json:"-"`
 
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
-	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `json:"-" gorm:"index"`
 }
 
 var (
@@ -40,6 +40,7 @@ func (u *User) HashPassword() error {
 	u.Password = encodedHash
 	return nil
 }
+
 func (u *User) ValidatePassword(password string) (bool, error) {
 	match, err := utils.ComparePasswordAndHash(password, u.Password)
 	if err != nil {

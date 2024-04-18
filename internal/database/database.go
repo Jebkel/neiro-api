@@ -11,9 +11,9 @@ import (
 )
 
 var db *gorm.DB
-var err error
 
 func Init() *sql.DB {
+	var err error
 	cfg := config.GetConfig().DBConfig
 	switch cfg.Type {
 	case "mysql":

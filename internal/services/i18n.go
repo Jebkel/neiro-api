@@ -49,3 +49,7 @@ func (i *I18nService) TranslateValidationError(language string, err validator.Va
 	}
 	return &errorMessages
 }
+
+func (i *I18nService) TranslateMessage(language string, key string) string {
+	return i.I18n.T(language, key, goeasyi18n.Options{})
+}

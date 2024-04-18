@@ -18,6 +18,13 @@ type DBConfig struct {
 	MaxConn   int    `yaml:"max_connections"`
 }
 
+type RedisConfig struct {
+	Host     string `yaml:"host"`
+	Port     string `yaml:"port"`
+	Password string `yaml:"password"`
+	DB       int    `yaml:"db"`
+}
+
 type JwtConfig struct {
 	JWTSecret          string        `yaml:"jwt_secret"`
 	JwtDuration        time.Duration `yaml:"jwt_duration"`
@@ -34,8 +41,9 @@ type AppConfig struct {
 type Config struct {
 	App AppConfig `yaml:"app_config"`
 
-	JwtConfig JwtConfig `yaml:"jwt_config"`
-	DBConfig  DBConfig  `yaml:"db_config"`
+	JwtConfig   JwtConfig   `yaml:"jwt_config"`
+	DBConfig    DBConfig    `yaml:"db_config"`
+	RedisConfig RedisConfig `yaml:"redis_config"`
 }
 
 var config *Config
