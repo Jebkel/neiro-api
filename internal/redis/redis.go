@@ -1,22 +1,34 @@
 package redis
 
 import (
+	"context"
 	"fmt"
 	"github.com/redis/go-redis/v9"
 	"neiro-api/config"
+	"sync"
 )
 
-var redisClient *redis.Client
-
-func Init() {
-	cfg := config.GetConfig().RedisConfig
-	redisClient = redis.NewClient(&redis.Options{
-		Addr:     fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
-		Password: cfg.Password,
-		DB:       cfg.DB,
-	})
+type ManagerRedis struct {
+	ClientRedis *redis.Client
+	Ctx         context.Context
 }
 
-func GetRedis() *redis.Client {
-	return redisClient
+var (
+	instance *ManagerRedis
+	once     sync.Once
+)
+
+func GetRedis() *ManagerRedis {
+	once.Do(func() {
+		cfg := config.GetConfig().RedisConfig
+		instance = &ManagerRedis{
+			ClientRedis: redis.NewClient(&redis.Options{
+				Addr:     fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
+				Password: cfg.Password,
+				DB:       cfg.DB,
+			}),
+			Ctx: context.Background(),
+		}
+	})
+	return instance
 }

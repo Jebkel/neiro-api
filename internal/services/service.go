@@ -6,8 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"neiro-api/internal/helpers"
+	"neiro-api/internal/redis"
 	"neiro-api/internal/services/i18n"
 	"neiro-api/internal/services/jwt"
+	"neiro-api/internal/services/mail"
 	"neiro-api/internal/utils"
 	"net/http"
 )
@@ -24,15 +26,29 @@ type JwtManager interface {
 	CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error)
 }
 
+type MailManager interface {
+	New() *mail.ServiceMail
+	To(recipient string) *mail.ServiceMail
+	From(from string) *mail.ServiceMail
+	Line(line string) *mail.ServiceMail
+	Header(header string) *mail.ServiceMail
+	Subject(subject string) *mail.ServiceMail
+	Send()
+}
+
 type Service struct {
 	Translator
 	JwtManager
+	MailManager
+	RedisManager *redis.ManagerRedis
 }
 
 func NewService() *Service {
 	return &Service{
-		Translator: i18n.NewI18NService(),
-		JwtManager: jwt.NewJwtService(),
+		Translator:   i18n.NewI18NService(),
+		JwtManager:   jwt.NewJwtService(),
+		MailManager:  mail.NewMailService(),
+		RedisManager: redis.GetRedis(),
 	}
 }
 

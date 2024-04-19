@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-type Service struct {
+type ServiceJwt struct {
 	db          *gorm.DB
 	secretKey   []byte
 	tokenExpire time.Duration
@@ -24,9 +24,9 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-func NewJwtService() *Service {
+func NewJwtService() *ServiceJwt {
 	cfg := config.GetConfig().JwtConfig
-	return &Service{
+	return &ServiceJwt{
 		db:          database.GetDB(),
 		secretKey:   []byte(cfg.JWTSecret),
 		tokenExpire: cfg.JwtDuration,
@@ -34,7 +34,7 @@ func NewJwtService() *Service {
 }
 
 // ParseJwtToken : Проверяет рабочий ли токен и возвращает данные из токена в случае успеха
-func (j *Service) ParseJwtToken(tokenString string) (*CustomClaims, error) {
+func (j *ServiceJwt) ParseJwtToken(tokenString string) (*CustomClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// Проверка на метод, используемый для подписи токена
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -55,7 +55,7 @@ func (j *Service) ParseJwtToken(tokenString string) (*CustomClaims, error) {
 }
 
 // CheckTokenInDB : проверяет, существует ли сессия в базе данных
-func (j *Service) CheckTokenInDB(jwtID string) (bool, error) {
+func (j *ServiceJwt) CheckTokenInDB(jwtID string) (bool, error) {
 	var UserSession models.UserSessions
 	result := j.db.Where("id = ?", jwtID).First(&UserSession)
 	if result.Error != nil || result.RowsAffected == 0 {
@@ -65,11 +65,11 @@ func (j *Service) CheckTokenInDB(jwtID string) (bool, error) {
 }
 
 // DeprecateSession : удаляет сессию из базы данных
-func (j *Service) DeprecateSession(jwtID string) {
+func (j *ServiceJwt) DeprecateSession(jwtID string) {
 	j.db.Delete(&models.UserSessions{}, jwtID)
 }
 
-func (j *Service) CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error) {
+func (j *ServiceJwt) CreateJwtToken(userID uint, ipAddress string) (signedToken string, refreshToken string, err error) {
 	refreshToken = uuid.New().String()
 	userSession := models.UserSessions{
 		IpAddress:    ipAddress,

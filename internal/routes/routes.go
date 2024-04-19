@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"neiro-api/internal/handlers"
 	"neiro-api/internal/handlers/auth"
+	"neiro-api/internal/handlers/passwordReset"
 	"neiro-api/internal/handlers/user"
 	"neiro-api/internal/middlewares"
 	"neiro-api/internal/redis"
@@ -15,7 +16,7 @@ func Init() *gin.Engine {
 	r := gin.New()
 
 	store := ratelimit.RedisStore(&ratelimit.RedisOptions{
-		RedisClient: redis.GetRedis(),
+		RedisClient: redis.GetRedis().ClientRedis,
 		Rate:        time.Second,
 		Limit:       20,
 	})
@@ -31,6 +32,7 @@ func Init() *gin.Engine {
 
 	auth.HandlerAuth{Handler: handler}.Init(r.Group("/auth"))
 	user.HandlerUser{Handler: handler}.Init(r.Group("/user"))
+	passwordReset.HandlerPasswordReset{Handler: handler}.Init(r.Group("/password/reset"))
 
 	return r
 }

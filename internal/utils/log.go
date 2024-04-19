@@ -16,6 +16,7 @@ func UseJSONLogFormat() {
 		Program: cfg.App.ProjectName,
 		Env:     cfg.App.Env,
 	})
+	log.SetLevel(log.DebugLevel)
 }
 
 // Timestamps in microsecond resolution (like time.RFC3339Nano but microseconds)

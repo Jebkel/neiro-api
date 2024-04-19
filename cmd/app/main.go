@@ -8,7 +8,7 @@ import (
 	"neiro-api/config"
 	"neiro-api/internal/database"
 	"neiro-api/internal/models"
-	"neiro-api/internal/redis"
+	"neiro-api/internal/queue"
 	"neiro-api/internal/routes"
 	"neiro-api/internal/utils"
 )
@@ -31,7 +31,7 @@ func main() {
 		}
 	}(sqlDB)
 
-	redis.Init()
+	go queue.Init()
 
 	gin.SetMode(gin.DebugMode)
 

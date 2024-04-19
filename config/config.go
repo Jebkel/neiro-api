@@ -38,12 +38,22 @@ type AppConfig struct {
 	ProjectName string `yaml:"project_name"`
 }
 
+type MailConfig struct {
+	Host       string `yaml:"host"`
+	Port       int    `yaml:"port"`
+	Login      string `yaml:"login"`
+	Password   string `yaml:"password"`
+	FromMailer string `yaml:"from_mailer"`
+	TLS        bool   `yaml:"tls"`
+}
+
 type Config struct {
 	App AppConfig `yaml:"app_config"`
 
 	JwtConfig   JwtConfig   `yaml:"jwt_config"`
 	DBConfig    DBConfig    `yaml:"db_config"`
 	RedisConfig RedisConfig `yaml:"redis_config"`
+	MailConfig  MailConfig  `yaml:"mail_config"`
 }
 
 var config *Config
