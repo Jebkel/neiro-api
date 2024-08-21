@@ -104,6 +104,7 @@ func (h HandlerAuth) Login(c *gin.Context) {
 	if err != nil || !check {
 		utils.NewErrorResponse(c, http.StatusBadRequest,
 			h.Services.TranslateMessage(language, "invalid_login_or_password"), &gin.H{})
+		return
 	}
 
 	// Генерация JWT токенов
